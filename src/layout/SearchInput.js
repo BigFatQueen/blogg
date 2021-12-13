@@ -13,7 +13,7 @@ import { withStyles } from "@material-ui/core/styles";
 import axios from "axios";
 import { BaseUrl, getFullUrl } from "../helpers/Constant";
 import { Avatar, Divider, Typography } from "@mui/material";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import CircularProgress from "@mui/material/CircularProgress";
 const styles = {
   root: {
     marginLeft: 5,
