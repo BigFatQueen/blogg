@@ -286,7 +286,7 @@ const CreatorProfileView = ({ user }) => {
 
     user_info: { profile_image, cover_photo, bio, profile_url, socials },
   } = user;
-  const { name } = user.user_info.user;
+  const { name, id: userid } = user.user_info.user;
   //end for share tooltip
 
   const joinPlanByid = (planid) => {
@@ -301,6 +301,10 @@ const CreatorProfileView = ({ user }) => {
     if (data.length > 0) {
       window.open(data.link, "_blank");
     }
+  };
+
+  const moreDetail = (id) => {
+    history.push("/creator-edit/");
   };
 
   console.log(user);
@@ -358,7 +362,7 @@ const CreatorProfileView = ({ user }) => {
               </Tooltip>
 
               <CButton>Follow</CButton>
-              <CButton>
+              <CButton onClick={() => moreDetail(userid)}>
                 <MoreHorizIcon />
               </CButton>
             </Box>

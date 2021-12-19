@@ -76,3 +76,5 @@ const post = {
   subscript_plan: [1, 2],
   category_id: 2,
 };
+
+///welcome to home

@@ -28,9 +28,9 @@ const useStyle = makeStyles((theme) => ({
     },
   },
   wrapper: {
-    minHeight: "100vh",
+    // minHeight: "100vh",
     display: "grid",
-    marginTop: "5vh",
+
     placeItems: "center",
     [theme.breakpoints.only("xs")]: {
       display: "block",

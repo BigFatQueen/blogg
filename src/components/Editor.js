@@ -1,31 +1,34 @@
-import React, { useRef, useState, useMemo } from 'react'
-import JoditEditor from 'jodit-react'
+/** @format */
 
-const Editor = (props) => {
-  //contents is the dynamic value from parent
-  const { contents, getValue } = props
-  const editor = useRef(null)
+import React, { useRef, useState, useMemo } from "react";
+import JoditEditor from "jodit-react";
+
+const Editor = ({ oldvalue = "", ...props }) => {
+  const { contents, getValue } = props;
+  const editor = useRef(null);
   const config = {
     buttons: [
-      'bold',
-      'italic',
-      'underline',
-      'strikethrough',
-      '|',
-      'ul',
-      'ol',
-      '|',
-      'center',
-      'left',
-      'right',
-      'justify',
-      '|',
-      'link',
+      "bold",
+      "italic",
+      "underline",
+      "strikethrough",
+      "|",
+      "ul",
+      "ol",
+      "|",
+      "center",
+      "left",
+      "right",
+      "justify",
+      "|",
+      "link",
       // 'image',
     ],
     uploader: { insertImageAsBase64URI: true },
-    removeButtons: ['brush', 'file', 'image'],
-  }
+    removeButtons: ["brush", "file", "image"],
+  };
+
+  //contents is the dynamic value from parent
 
   return useMemo(
     () => (
@@ -37,7 +40,7 @@ const Editor = (props) => {
       />
     ),
     []
-  )
-}
+  );
+};
 
-export default Editor
+export default Editor;

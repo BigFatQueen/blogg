@@ -84,7 +84,7 @@ function App() {
           <CreatorProfile />
         </Route> */}
 
-        <Route path="/creator-edit">
+        <Route path="/creator-edit/">
           <EditProfile />
         </Route>
 

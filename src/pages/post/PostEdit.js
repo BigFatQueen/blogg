@@ -10,6 +10,7 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
+import IconButton from "@mui/material/IconButton";
 import TextareaAutosize from "@mui/material/TextareaAutosize";
 import FormLabel from "@mui/material/FormLabel";
 import { FaTimes } from "react-icons/fa";
@@ -35,6 +36,7 @@ import LinkPreview from "../../components/LinkPreview";
 import { useAuthContext } from "../../context/AuthContext";
 import { BaseUrl } from "../../helpers/Constant";
 import axios from "axios";
+const label = { inputProps: { "aria-label": "Checkbox demo" } };
 const useStyles = makeStyles((theme) => ({
   container: {
     marginTop: "10vh",
@@ -132,6 +134,23 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "flex-end",
     fontWeight: "600 !important",
   },
+  pollDiv: {
+    backgroundColor: "rgb(251,247,243)",
+    display: "flex",
+    flexDirection: "column",
+    minHeight: "40vh",
+    justifyContent: "center",
+    border: "2px dashed rgb(229,227,221)",
+    marginBottom: "6px",
+    padding: "20px",
+  },
+  pollFormControl: {
+    marginBottom: "2vh",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
 }));
 const PostEdit = () => {
   // getting data of customFetcher
@@ -158,6 +177,7 @@ const PostEdit = () => {
     seefirst: "tierChoices",
     linkSelected: false,
     link: "undefined",
+    oldpollOption: [],
     pollOption: [],
     postid: "",
   });
@@ -177,6 +197,7 @@ const PostEdit = () => {
     isPollSelected,
     postUpdated,
     post,
+    poll_options,
     handleEditInputImage,
     RemoveData,
   } = usePostContext();
@@ -243,7 +264,7 @@ const PostEdit = () => {
           seefirst: data.type,
           linkSelected: data.link === "undefined" ? false : true,
           link: data.link || "",
-          pollOption: data.pollOption,
+          oldpollOption: data.poll_options,
         }));
         console.log(typeof data.image);
         let object = {
@@ -312,6 +333,7 @@ const PostEdit = () => {
     formData.append("type", state.seefirst);
 
     formData.append("link", state.link);
+    formData.append("poll_options", JSON.stringify(state.pollOption));
 
     formData.append("_method", "PUT");
     postUpdated(formData, id);
@@ -354,7 +376,7 @@ const PostEdit = () => {
                   variant="subtitle1"
                   component="div"
                   className={classes.title}>
-                  Create Post
+                  Update Post
                 </Typography>
                 <CloseIcon onClick={CancelPostHandling} />
               </Box>
@@ -423,6 +445,26 @@ const PostEdit = () => {
                         }}>
                         <FaTimes />
                       </button>
+                    </div>
+                  )}
+
+                  {state.oldpollOption.length > 0 && (
+                    <div className={classes.pollDiv}>
+                      {state.pollOption.map((item, i) => {
+                        return (
+                          <Box key={i} className={classes.pollFormControl}>
+                            <Checkbox {...label} />
+                            <TextField
+                              readOnly
+                              id="outlined-basic"
+                              variant="outlined"
+                              fullWidth
+                              name={item.name}
+                              value={item.name}
+                            />
+                          </Box>
+                        );
+                      })}
                     </div>
                   )}
 

@@ -7,6 +7,7 @@ import axios from "axios";
 import { useHistory } from "react-router";
 import { BaseUrl } from "../helpers/Constant";
 import { useAuthContext } from "./AuthContext";
+import { SettingsInputAntennaTwoTone } from "@mui/icons-material";
 
 const PostContext = React.createContext();
 
@@ -24,12 +25,14 @@ const initialStates = {
   loading: false,
   posts: [],
   post: {},
+  error: {},
 };
 let cancelToken;
 const PostProvider = ({ children }) => {
   const history = useHistory();
   const { isAuthenticated, token } = useAuthContext();
   const [cancelTokenSource, setCancelTokenSource] = React.useState();
+  const [error, setError] = React.useState({});
   const [state, dispatch] = React.useReducer(reducer, initialStates);
   const handleInputImage = (data) => {
     console.log(data);
@@ -113,14 +116,21 @@ const PostProvider = ({ children }) => {
         },
       });
 
-      response.then((data) => {
-        console.log(data.data);
-        if (data.data.success) {
-          history.push("/home");
-        }
-      });
-    } catch (err) {
-      console.log(err);
+      response
+        .then((data) => {
+          console.log(data.data);
+          if (data.data.success) {
+            history.push("/home");
+          }
+        })
+        .catch((err) => {
+          if (err.response.status === 422) {
+            console.log(err.response.data.errors);
+            setError(err.response.data.errors);
+          }
+        });
+    } catch (error) {
+      console.log(error.message);
     }
   };
 
@@ -159,6 +169,7 @@ const PostProvider = ({ children }) => {
         }
       });
     } catch (err) {
+      console.log("helowrod");
       console.log(err);
     }
   };
@@ -260,7 +271,7 @@ const PostProvider = ({ children }) => {
       });
 
       response.then((data) => {
-        getPosts();
+        // getPosts();
       });
     } catch (response) {
       console.log(response);
@@ -308,7 +319,7 @@ const PostProvider = ({ children }) => {
 
   const ReplyCreate = (formData) => {
     try {
-      const response = axios({
+      axios({
         method: "post",
         url: `${BaseUrl}/comment-reply/`,
         data: formData,
@@ -316,10 +327,9 @@ const PostProvider = ({ children }) => {
           Accept: "application/json",
           Authorization: `Bearer ${token}`,
         },
-      });
-
-      response.then((data) => {
-        //  getPosts();
+      }).then((res) => {
+        console.log("now you r here");
+        //getPosts();
       });
     } catch (response) {
       console.log(response);
@@ -367,20 +377,28 @@ const PostProvider = ({ children }) => {
 
   //getting all post
 
-  const getPosts = async () => {
+  const getPosts = async (type) => {
+    console.log("now you r here getposts");
+    dispatch({ type: "SET_LOADING" });
     try {
       const response = await axios({
         method: "get",
         url: `${BaseUrl}/content`,
+        params: {
+          type: type,
+        },
         headers: {
           Accept: "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
+      dispatch({ type: "UNSET_LOADING" });
+      return response.data.data;
 
-      if (response.status === 200) {
-        dispatch({ type: "LOAD_DATA", payload: response.data.data });
-      }
+      // if (response.status === 200) {
+      //   dispatch({ type: "LOAD_DATA", payload: response.data.data });
+      //   dispatch({ type: "UNSET_LOADING" });
+      // }
     } catch (err) {
       console.log(err.response);
     }
@@ -460,6 +478,7 @@ const PostProvider = ({ children }) => {
         handleEditInputImage,
         RemoveData,
         pollAction,
+        error,
       }}>
       {children}
     </PostContext.Provider>

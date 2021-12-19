@@ -11,6 +11,7 @@ export default function BasicSelect({
   categories,
   getCategory,
   category_id = 0,
+  error,
 }) {
   const [category, setCategory] = React.useState("");
 
@@ -27,7 +28,9 @@ export default function BasicSelect({
 
   return (
     <Box sx={{ minWidth: 120, marginTop: "16px" }}>
-      <FormControl fullWidth>
+      <FormControl
+        fullWidth
+        error={Object.keys(error).length > 0 ? true : false}>
         <InputLabel id="demo-simple-select-label">Required</InputLabel>
         <Select
           labelId="demo-simple-select-label"

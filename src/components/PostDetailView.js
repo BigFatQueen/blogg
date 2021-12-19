@@ -46,6 +46,10 @@ import { Audio } from "./Audio";
 import LinkPreview from "./LinkPreview";
 import axios from "axios";
 import moment from "moment";
+import { SiOpenaccess } from "react-icons/si";
+import { MdOutlinePublic } from "react-icons/md";
+import { HiUserGroup } from "react-icons/hi";
+
 import PollOption from "./PollOption";
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -69,21 +73,32 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   postCard: {
-    padding: "20px",
+    padding: "10px 20px",
   },
   accInfo: {
     display: "flex",
+    padding: "0px",
     justifyContent: "start",
+    alignItems: "center",
     "& .MuiAvatar-root": {
       width: "50px",
       height: "50px",
     },
     "& h3": {
       fontWeight: "800",
-      display: "flex",
-      alignItems: "center",
       marginLeft: "16px",
       fontSize: "1.2rem",
+      marginBottom: "2px",
+      marginTop: "0px",
+    },
+
+    "& span": {
+      display: "flex",
+      padding: "0px",
+      justifyContent: "start",
+      marginLeft: "16px",
+      fontSize: "1rem",
+      marginBottom: "0px",
     },
   },
   postInfo: {
@@ -215,6 +230,7 @@ const PostDetailModel = (props) => {
   const { id } = useParams();
   const history = useHistory();
   const { user: authUser, token } = useAuthContext();
+  const [post, setPost] = React.useState({});
   const {
     getPostByid,
     LikeHandle,
@@ -252,6 +268,8 @@ const PostDetailModel = (props) => {
     reply: "",
   });
   // new add end
+
+  // end here too
 
   // console.log(newimgs);
 
@@ -292,6 +310,12 @@ const PostDetailModel = (props) => {
     comments,
     created_at,
     poll_options,
+    type,
+    creator: {
+      user_info: {
+        user: { id: creator_id },
+      },
+    },
   } = props.post;
   const { profile_image, user } = props.post.creator.user_info;
   const { name, id: userId } = user;
@@ -306,7 +330,7 @@ const PostDetailModel = (props) => {
 
   const deleteLike = (postid) => {
     const comment = likes.filter(
-      (like) => (like.user_info.user.id = authUser.id)
+      (like) => like.user_info.user.id === authUser.id
     );
 
     RemoveLike(comment[0].id);
@@ -324,9 +348,7 @@ const PostDetailModel = (props) => {
   // end here
 
   // action start
-  {
-    /* comment section start */
-  }
+
   const inputHandle = (e) => {
     const { name, value } = e.target;
     console.log(name, value);
@@ -364,13 +386,12 @@ const PostDetailModel = (props) => {
     formData.append("content_id", id);
     formData.append("comment", comment);
     CommentCreate(formData);
-
     props.changeData();
     setComment("");
   };
 
   const submitReplyline = (comment_id) => {
-    console.log(comment_id);
+    // console.log(comment_id);
     let formData = new FormData();
     formData.append("comment_id", comment_id);
     formData.append("comment", reply);
@@ -467,7 +488,7 @@ const PostDetailModel = (props) => {
       mm: "%d min",
       h: "an hour",
       hh: "%d hr",
-      d: "a day",
+      d: "%d d",
       dd: "%d d",
       w: "a week",
       ww: "%d w",
@@ -488,7 +509,15 @@ const PostDetailModel = (props) => {
             alt="Remy Sharp"
             src={getFullUrl(profile_image)}
           />
-          <h3>{name}</h3>
+          <Box>
+            <h3>{name}</h3>
+            <span>
+              {moment(created_at).fromNow(true)} .
+              {type === 3 && <SiOpenaccess />}
+              {type === 2 && <HiUserGroup />}
+              {type === 1 && <MdOutlinePublic />}
+            </span>
+          </Box>
         </Box>
 
         {/* post info */}
@@ -540,30 +569,38 @@ const PostDetailModel = (props) => {
             )}
           </span>
           <h2>{title}</h2>
-          <div className={classes.postDetail}>
-            <div
-              className={classes.shade}
-              style={{
-                opacity: content.length > 250 ? "1" : "0",
-                display: more ? "block" : "none",
-              }}></div>
-            <div
-              className={classes.postContent}
-              style={{
-                overflow: more ? "hidden" : "visible",
-                height: more ? "80px" : "100%",
-                transition: "ease-in",
-              }}>
-              <p>{content}</p>
-            </div>
-          </div>
 
-          {content.length > 250 && (
-            <span className={classes.readmore} onClick={() => setMore(!more)}>
-              {" "}
-              {more ? "continue reading" : "less reading"}
-            </span>
+          {content && (
+            <React.Fragment>
+              <div className={classes.postDetail}>
+                <div
+                  className={classes.shade}
+                  style={{
+                    opacity: content.length > 250 ? "1" : "0",
+                    display: more ? "block" : "none",
+                  }}></div>
+                <div
+                  className={classes.postContent}
+                  style={{
+                    overflow: more ? "hidden" : "visible",
+                    height: more ? "80px" : "100%",
+                    transition: "ease-in",
+                  }}>
+                  <p>{content}</p>
+                </div>
+              </div>
+
+              {content.length > 250 && (
+                <span
+                  className={classes.readmore}
+                  onClick={() => setMore(!more)}>
+                  {" "}
+                  {more ? "continue reading" : "less reading"}
+                </span>
+              )}
+            </React.Fragment>
           )}
+
           {/* <span
                       className={classes.readmore}
                       onClick={() => gotoDetail(postid)}>
@@ -571,7 +608,7 @@ const PostDetailModel = (props) => {
                     </span> */}
 
           {/*  poll */}
-          {poll_options.length >= 1 && <PollOption postid={postid} />}
+          {poll_options.length >= 1 && <PollOption post={props.post} />}
           <Button
             variant="contained"
             style={{
@@ -632,9 +669,12 @@ const PostDetailModel = (props) => {
             </Popover>
 
             {/*  post edit */}
-            <IconButton aria-label="Example" onClick={() => editPost(postid)}>
-              <EditIcon fontSize="large" />
-            </IconButton>
+
+            {authUser.id === creator_id && (
+              <IconButton aria-label="Example" onClick={() => editPost(postid)}>
+                <EditIcon fontSize="large" />
+              </IconButton>
+            )}
             {/* post edit end */}
             <IconButton aria-label="Example">
               <MoreHorizIcon fontSize="large" />
@@ -674,7 +714,7 @@ const PostDetailModel = (props) => {
               created_at,
             } = item;
             const { profile_image: cProfile } = user_info;
-            const { name } = user_info.user;
+            const { name, id: commenter_id } = user_info.user;
             const iscommentlike = comment_likes.some(function (el) {
               return el.user_info.user.id === authUser.id;
             });
@@ -729,21 +769,27 @@ const PostDetailModel = (props) => {
                           onClick={() => setShowReply(comment_id)}>
                           <ChatBubbleOutlineIcon fontSize="small" />
                         </IconButton>
-                        <IconButton
-                          aria-label="Example"
-                          onClick={() =>
-                            EditComment(postid, comment_id, saying)
-                          }>
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton
-                          aria-label="Example"
-                          onClick={() => {
-                            CommentDelete(comment_id);
-                            props.changeData();
-                          }}>
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
+
+                        {authUser.id === commenter_id && (
+                          <IconButton
+                            aria-label="Example"
+                            onClick={() =>
+                              EditComment(postid, comment_id, saying)
+                            }>
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        )}
+
+                        {authUser.id === commenter_id && (
+                          <IconButton
+                            aria-label="Example"
+                            onClick={() => {
+                              CommentDelete(comment_id);
+                              props.changeData();
+                            }}>
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        )}
                       </Box>
                     ) : (
                       <Box
@@ -808,7 +854,7 @@ const PostDetailModel = (props) => {
                     created_at: replyCreated_at,
                   } = r;
                   const { profile_image: rProfile } = user_info;
-                  const { name: reply_user } = user_info.user;
+                  const { name: reply_user, id: reply_id } = user_info.user;
                   return (
                     <div key={index} className={classes.reply}>
                       <div className={classes.replyInfo}>
@@ -858,21 +904,25 @@ const PostDetailModel = (props) => {
                             <h4>{reply_user}</h4>
                             <p>{reply}</p>
 
-                            <IconButton
-                              aria-label="Example"
-                              onClick={() =>
-                                editReplyHandle(comment_id, rid, reply)
-                              }>
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                            <IconButton
-                              aria-label="Example"
-                              onClick={() => {
-                                ReplyDelete(rid);
-                                props.changeData();
-                              }}>
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
+                            {authUser.id === reply_id && (
+                              <IconButton
+                                aria-label="Example"
+                                onClick={() =>
+                                  editReplyHandle(comment_id, rid, reply)
+                                }>
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                            )}
+                            {authUser.id === reply_id && (
+                              <IconButton
+                                aria-label="Example"
+                                onClick={() => {
+                                  ReplyDelete(rid);
+                                  props.changeData();
+                                }}>
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            )}
                             {/* <IconButton aria-label='Example'>
                                                     <FavoriteBorderIcon fontSize='small' />{' '}
                                                     <span className={classes.count}>3</span>

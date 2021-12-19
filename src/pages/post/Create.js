@@ -170,6 +170,7 @@ const PostCreate = () => {
     isPollSelected,
     postCreated,
     RemoveData,
+    error,
   } = usePostContext();
 
   const classes = useStyles();
@@ -307,13 +308,15 @@ const PostCreate = () => {
               {/* Post title */}
 
               <Box style={{ padding: "8px" }}>
-                <input
+                <TextField
                   type="text"
                   className={classes.postTitle}
                   name="title"
                   value={state.title}
                   placeholder="Post title(required)"
                   onChange={inputChange}
+                  error={Object.keys(error).length > 0 ? true : false}
+                  helperText={error["title"]}
                 />
 
                 <textarea
@@ -407,6 +410,7 @@ const PostCreate = () => {
                 </h4>
 
                 <MultipleSelectCheckmarks
+                  error={error}
                   getCategory={getCategory}
                   categories={categories}
                 />

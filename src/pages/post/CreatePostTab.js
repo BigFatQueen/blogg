@@ -158,6 +158,7 @@ const initalData = {
 export default function BasicTabs(props) {
   const { handleInputImage, handleInputVideo, handleInputAudio } =
     usePostContext();
+
   const { getImage } = props;
   const classes = useStyles();
   const image = React.useRef();
